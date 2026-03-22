@@ -12,7 +12,7 @@ data_train["Pclass"] = (data_train["Pclass"] > 2).astype(int) #признаки 
 data_train["Sex_parser"] = (data_train["Sex"] == "female").astype(int)  #признаки пола. Если женщина, то 1. Иначе 0
 middle_age = data_train["Age"].mean() #среднее значения возраста
 data_train["Young"] = (data_train["Age"] < middle_age).astype(int) #признаки возраста. Если меньше среднего то 1, иначе 0
-data_train["Familly"] = data_train["SibSp"] + data_train["Parch"] #признаки родствеников. 1 для счета самого пассажира
+data_train["Familly"] = data_train["SibSp"] + data_train["Parch"] + 1 #признаки родствеников. 1 для счета самого пассажира
 data_train["Familly"] = (data_train["Familly"] < 2).astype(int) #признаки родствеников. Меньше 1, то 1. Иначе 0
 
 clean_table = data_train.dropna(subset="Age") #Создаем таблицу, удаляя пропускии возраста
