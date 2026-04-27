@@ -1,41 +1,49 @@
+# импортируем нужные библиотеки 
 import pandas as pd
-import tensorflow as tf
-from tensorflow import keras
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
-url = "/content/train.csv" #тренировочные данные
-url2 = "/content/test.csv" #тестовые данные
+data_train = pd.read_csv('/content/train.csv')# загружаем тренировочные данные
+data_test = pd.read_csv('/content/test.csv')# загружаем тестовые данные
 
-data_train = pd.read_csv(url) #создаём таблицу тренировчных данных
-data_test = pd.read_csv(url2) #создаём таблицу тестовых данных
+# высчитываем медиану, т.е. число по середине
+median_age = data_train['Age'].median()
+median_fare = data_train['Fare'].median()
 
-data_train["Pclass"] = (data_train["Pclass"] > 2).astype(int) #признаки класса пассажира. Если 3 то 1, иначе 0
-data_train["Sex_parser"] = (data_train["Sex"] == "female").astype(int)  #признаки пола. Если женщина, то 1. Иначе 0
-middle_age = data_train["Age"].mean() #среднее значения возраста
-data_train["Young"] = (data_train["Age"] < middle_age).astype(int) #признаки возраста. Если меньше среднего то 1, иначе 0
-data_train["Familly"] = data_train["SibSp"] + data_train["Parch"] + 1 #признаки родствеников. 1 для счета самого пассажира
-data_train["Familly"] = (data_train["Familly"] < 2).astype(int) #признаки родствеников. Меньше 1, то 1. Иначе 0
+def data_table(data):
+  data['Sex_Parser'] = (data['Sex'] == 'female').astype(int)#  #признаки пола. Если женщина, то 1. Иначе 0
+  data['Pclass'] = (data['Pclass'] > 2).astype(int)# признаки класса пассажира. Если 3 то 1, иначе 0
+  data['Young'] = (data['Age'].fillna(median_age) < 30).astype(int)# заполняем медиану для пропусков возраста
+  data["Large_Family"] = (((data['SibSp'] + data['Parch']) + 1) > 2).astype(int)# #признаки родствеников. Больше 2, то 1. Иначе 0
+  data['Fare_Final'] = data['Fare'].fillna(median_fare)# заполняем медиану для пропусков цены билета
 
-clean_table = data_train.dropna(subset="Age") #Создаем таблицу, удаляя пропускии возраста
-x = clean_table[["Pclass", "Sex_parser", "Young", "Familly"]] #Объединяем признаки в таблицу
-y = clean_table[["Survived"]] #Признаки выживших
+  features  = ['Sex_Parser', 'Pclass', 'Young', 'Large_Family', 'Fare_Final']# все признаки
+  return data[features]
 
-model = keras.Sequential([
-    keras.layers.Dense(128, activation="relu"), #Начальный слой
-    keras.layers.Dense(64, activation="relu"), #Скрытый слой
-    keras.layers.Dense(1, activation="sigmoid") #Выходной слой
-])
-model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]) #Оптимизируем код, валидацию убрал для 100 процентов данных.
-model.fit(x, y, epochs=50) #Обучаем
+x = data_table(data_train)# таблица признаков
+y = data_train['Survived']# число выживших
 
-#делаем тоже самое для тестовых данных
-data_test["Pclass"] = (data_test["Pclass"] > 2).astype(int)
-data_test["Sex_parser"] = (data_test["Sex"] == "female").astype(int)
-data_test["Age"] = data_test["Age"].fillna(0).astype(int) #заполняем пропуски нулями.
-data_test["Young"] = (data_test["Age"] < middle_age).astype(int)
-data_test["Familly"] = data_test["SibSp"] + data_test["Parch"]
-data_test["Familly"] = (data_test["Familly"] < 2).astype(int)
+x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)# валидация 20%
 
-x_test = data_test[["Pclass", "Sex_parser", "Young", "Familly"]] # объединяем признаки в таблицу
-prediction = model.predict(x_test[:10]) #берем первые десять данных
-prediction_digits = (prediction > 0.5).astype(int).flatten() #больше 0.5 то 1. Иначе 0. Записываем в строку для удобства
-print(prediction_digits) #Выводим результат
+model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)# древо для табличных данных
+model.fit(x_train, y_train)# обучение модели
+
+train_preds = model.predict(x_train)# предсказания для тренировочных данных
+val_preds = model.predict(x_val)# предсказания для валидационных данных
+
+print(f"Accuracy на обучении: {accuracy_score(y_train, train_preds) * 100:.2f}%")# выводим тренировочные данные
+print(f"Accuracy на валидации: {accuracy_score(y_val, val_preds) * 100:.2f}%")# выводим валидационные данные
+
+x_test = data_table(data_test)# тестовые данные
+prediction = model.predict(x_test)# предсказания для тестовых данных
+print(f"Выжившие на первых 10 данных: {prediction[:10]}")# выводим предсказания для первых 10 пассажиров
+
+# Сохраняем результат в формате CSV для загрузки на Kaggle
+submission = pd.DataFrame({
+    'PassengerId': data_test['PassengerId'],
+    'Survived': prediction
+})
+
+submission.to_csv("submission.csv", index=False)
+print("Файл submission.csv успешно создан!")
