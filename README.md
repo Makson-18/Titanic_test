@@ -1,4 +1,5 @@
-# Titanic Survival Prediction 79% (Random Forest). KAGGLE
+# Titanic 🚢 Survival Prediction 79% (Random Forest). KAGGLE [![Kaggle](https://img.shields.io/badge/-K-20BEFF)]
+
 
 A project for classifying surviving passengers of the Titanic based on popular features (gender, age, cabin class, etc.).
 
