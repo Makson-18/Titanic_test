@@ -1,26 +1,30 @@
 # Titanic Survival Prediction 79% (Random Forest). KAGGLE
 
-Проект по классификации выживших пассажиров Титаника на основе популярных признаков (пол, возраст, класс каюты и др.). 
+A project for classifying surviving passengers of the Titanic based on popular features (gender, age, cabin class, etc.).
 
-### Основные особенности:
-- **Feature Engineering**: Созданы новые бинарные признаки, такие как `Young` (возраст до 30) и `Large_Family` (наличие семьи более 2 человек).
-- **Корректная обработка пропусков**: Использована медиана тренировочных данных для заполнения пропусков в возрасте и стоимости билета, что предотвращает утечку данных (Data Leakage).
-- **Валидация**: Данные разделены на тренировочную и валидационную выборку (80/20) для оценки реальной точности модели.
-- **Алгоритм**: Случайный лес (`RandomForestClassifier`) с ограничением глубины для предотвращения переобучения.
+### Key Features:
 
-### Стек технологий:
+- **Feature Engineering**: Created new binary features, such as Young (age under 30) and Large_Family (having a family of more than 2 people).
+- **Correct Missing Value Imputation**: Used the median of the training data to fill in missing values for age and fare, preventing Data Leakage.
+- **Validation**: Data is split into training and validation sets (80/20) to evaluate the model's real accuracy.
+- **Algorithm**: Random Forest (RandomForestClassifier) with depth constraints to prevent overfitting.
+
+### Tech Stack:
+
 - **Python 3.12**
-- **Pandas**: для работы с таблицами.
-- **Scikit-learn**: Построение модели, предобработка и метрики.
+- **Pandas**: for working with tables.
+- **Scikit-learn**: Model building, preprocessing, and metrics.
 
-### Результаты:
-Модель показывает стабильную точность (Accuracy) около **81%** на валидационных данных.
+### Results:
 
-### Как использовать:
-1. Клонируйте репозиторий.
-2. Убедитесь, что файлы `train.csv` и `test.csv` находятся в основной папке проекта.
-3. Запустите код titanik.py:
-4. Итоговый файл `submission.csv` будет готов для загрузки на Kaggle.
+The model shows a stable accuracy of about **81%** on validation data.
 
-**Цель**: Впервые попробовать Kaggle и улучшить работу с табличными данными.
+### How to use:
+
+1. Clone the repository.
+2. Make sure that the train.csv and test.csv files are in the main project folder.
+3. Run the code titanik.py:
+4. The final submission.csv file will be ready for upload to Kaggle.
+
+**Goal**: Try Kaggle for the first time and improve tabular data handling.
 
