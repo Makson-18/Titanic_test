@@ -11,7 +11,7 @@ A project for classifying surviving passengers of the Titanic based on popular f
 
 ### Tech Stack:
 
-- **Python 3.12**
+- **Python 3.13**
 - **Pandas**: for working with tables.
 - **Scikit-learn**: Model building, preprocessing, and metrics.
 
